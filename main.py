@@ -1,4 +1,4 @@
-from assistant_app.cli import main
+from banking_app.cli import main
 
 
 if __name__ == "__main__":

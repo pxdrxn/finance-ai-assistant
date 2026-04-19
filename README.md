@@ -1,65 +1,41 @@
-# Assistente Virtual de Relacionamento Financeiro
+# Sistema Bancário Orientado a Objetos
 
-Projeto de portfólio em Python para demonstrar engenharia aplicada a IA generativa no contexto financeiro. A aplicação oferece FAQ inteligente, simulação de juros, memória de contexto persistente, API REST com FastAPI, chat em console, logs e testes automatizados.
+Projeto em Python desenvolvido com base no modelo UML clássico do desafio da DIO. A aplicação implementa as entidades `Cliente`, `PessoaFisica`, `Conta`, `ContaCorrente`, `Historico`, `Transacao`, `Deposito` e `Saque`, com foco em orientação a objetos, clareza de modelagem e regras de negócio bancárias.
 
 ## Objetivo
 
-Construir um assistente virtual capaz de:
+Simular operações bancárias essenciais em um sistema de console, respeitando o relacionamento entre cliente, conta e transações conforme o diagrama da atividade.
 
-- responder dúvidas frequentes sobre produtos financeiros em linguagem natural
-- simular juros simples e compostos
-- manter contexto do usuário entre interações
-- operar tanto em linha de comando quanto por API HTTP
-- aplicar boas práticas de organização, testes e tratamento de falhas
+## Modelagem implementada
 
-## Stack
+- `Historico`: registra transações com data, tipo e valor
+- `Transacao`: interface abstrata com método `registrar`
+- `Deposito` e `Saque`: implementações concretas da interface
+- `Cliente`: responsável por executar transações e vincular contas
+- `PessoaFisica`: especialização de cliente com `cpf`, `nome` e `data_nascimento`
+- `Conta`: classe base com `saldo`, `numero`, `agencia`, `cliente` e `historico`
+- `ContaCorrente`: especialização com `limite` e `limite_saques`
 
-- Python 3.12
-- OpenAI SDK
-- FastAPI
-- Pytest
-- JSON como persistência simples de contexto
-- Docker para execução containerizada
+## Extras adicionados
 
-## Arquitetura
+- persistência simples em JSON para manter clientes e contas entre execuções
+- extrato detalhado com data e tipo de movimentação
+- transferência entre contas no menu principal
+- testes automatizados para regras críticas do domínio
+
+## Estrutura
 
 ```text
-assistant_app/
-  api/          # API REST e schemas
-  core/         # Regras de negócio puras, como cálculos
-  services/     # Orquestração do assistente, LLM e persistência
-  utils/        # Logging e utilitários
-tests/          # Testes automatizados
-data/           # Persistência local do histórico das conversas
-logs/           # Logs da aplicação
+banking_app/
+  cli.py         # Interface de console
+  models.py      # Classes do domínio bancário
+  repository.py  # Persistência em JSON
+  service.py     # Regras de orquestração do sistema
+tests/
+  test_banking_domain.py
 ```
 
-## Funcionalidades
-
-- FAQ financeiro com fallback local
-- integração com LLM via `openai`
-- persistência de nome, último valor e histórico recente
-- respostas com disclaimer educacional
-- API REST com endpoint `/chat`
-- healthcheck em `/health`
-- logs em arquivo
-- testes unitários e de API
-
-## Configuração
-
-1. Crie o arquivo `.env` com sua chave:
-
-```env
-OPENAI_API_KEY=sua_chave_aqui
-```
-
-2. Instale as dependências:
-
-```bash
-pip install -r requirements.txt
-```
-
-## Como executar no console
+## Como executar
 
 ```bash
 python app.py
@@ -71,46 +47,16 @@ Ou:
 python main.py
 ```
 
-## Como executar a API
+## Operações disponíveis
 
-```bash
-uvicorn assistant_app.api.app:app --reload
-```
-
-A documentação interativa ficará disponível em:
-
-- `http://127.0.0.1:8000/docs`
-- `http://127.0.0.1:8000/redoc`
-
-## Exemplo de uso da API
-
-### Requisição
-
-```bash
-curl -X POST "http://127.0.0.1:8000/chat" ^
-  -H "Content-Type: application/json" ^
-  -d "{\"message\":\"Qual a diferença entre CDB e poupança?\",\"session_id\":\"pedro-001\"}"
-```
-
-### Resposta esperada
-
-```json
-{
-  "session_id": "pedro-001",
-  "answer": "Em geral, o CDB costuma oferecer rentabilidade maior do que a poupança..."
-}
-```
-
-## Exemplos de perguntas
-
-- `Meu nome é Carla e quero começar com R$ 3.000`
-- `Qual meu nome?`
-- `Lembre qual foi o último valor que eu mencionei`
-- `Qual a diferença entre CDB, poupança e Tesouro Selic?`
-- `O CDB pode fazer mais sentido do que a poupança para uma reserva?`
-- `Se eu investir R$ 5.000 a 1,1% ao mês por 12 meses, quanto terei no final?`
-- `Simular juros simples para R$ 1000 a 2% por 6 meses`
-- `Simular juros compostos para R$ 10000 a 0,9% por 24 meses`
+- criar cliente
+- criar conta corrente
+- depositar
+- sacar
+- emitir extrato
+- listar clientes
+- listar contas
+- transferir entre contas
 
 ## Testes
 
@@ -118,32 +64,17 @@ curl -X POST "http://127.0.0.1:8000/chat" ^
 pytest
 ```
 
-## Docker
+## Exemplo de fluxo
 
-### Build
+1. Cadastrar um cliente com CPF único.
+2. Criar uma conta corrente para esse cliente.
+3. Realizar depósitos e saques.
+4. Consultar o extrato com histórico das movimentações.
+5. Transferir valores entre contas cadastradas.
 
-```bash
-docker build -t finance-assistant .
-```
+## Diferenciais do projeto
 
-### Run
-
-```bash
-docker run -p 8000:8000 --env-file .env finance-assistant
-```
-
-## Diferenciais de portfólio
-
-- separação clara entre domínio, serviços e interface
-- persistência simples e extensível
-- fallback resiliente quando a API do modelo falha
-- mesma regra de negócio exposta em CLI e API
-- cobertura inicial com testes automatizados
-- pronto para evoluir para banco relacional, autenticação e deploy
-
-## Próximos passos
-
-- trocar JSON por SQLite ou PostgreSQL
-- adicionar autenticação por token na API
-- versionar prompts e métricas de observabilidade
-- criar interface web com Streamlit ou React
+- aderência ao diagrama UML proposto
+- código organizado em camadas simples e fáceis de evoluir
+- extras úteis sem descaracterizar a modelagem do desafio
+- persistência local para enriquecer a demonstração
